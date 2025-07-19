@@ -4,6 +4,7 @@ from PyQt5.QtGui import QIcon, QFontDatabase, QFont
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QLabel,
                              QPushButton, QWidget, QVBoxLayout)
+from pages.addInventory import AddInventory
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -52,15 +53,21 @@ class MainWindow(QMainWindow):
 
     def addInventoryClicked(self):
         print("Clicked Add Inventory")
+        # TODO
+        # Implement transferring from main page to Add Inventory Page
 
     def currentInventoryClicked(self):
         print("Clicked Current Inventory")
-
+        # TODO
+        # Implement transferring from main page to Current Inventory Page
     def soldInventoryClicked(self):
         print("Clicked Sold Inventory")
-
+        # TODO
+        # Implement transferring from main page to Sold Inventory Page
     def incomeViewClicked(self):
         print("Clicked Income")
+        # TODO
+        # Implement transferring from main page to Income Page
 
 def main():
     app = QApplication(sys.argv)
