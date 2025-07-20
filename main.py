@@ -1,73 +1,67 @@
 # PyQT5 Intro
 import sys
-from PyQt5.QtGui import QIcon, QFontDatabase, QFont
+from PyQt5.QtGui import QIcon, QFontDatabase
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QLabel,
-                             QPushButton, QWidget, QVBoxLayout)
+                             QPushButton, QWidget, QVBoxLayout, QStackedWidget)
+from pages.mainMenu import MainMenu
 from pages.addInventory import AddInventory
+#from pages.currentInventory import CurrentInventory
+#from pages.soldInventory import SoldInventory
+#from pages.income import Income
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        # Window Setup
         self.setWindowTitle("Inventory Manager")
         self.setWindowIcon(QIcon("assets/antique.png"))
         self.screen_width = QApplication.primaryScreen().availableGeometry().width()
         self.screen_height = QApplication.primaryScreen().availableGeometry().height()
         self.setGeometry(0, 0, self.screen_width, self.screen_height)
-        self.buttonFontSize = 25
-        self.fixedButtonHeight = 65
+
         # Custom Font Setup
-        self.customFonts = ["fonts/DancingScript-VariableFont_wght.ttf",]
+        self.customFonts = ["fonts/DancingScript-VariableFont_wght.ttf", ]
         for font in self.customFonts:
-            if QFontDatabase.addApplicationFont(font) == -1: print("Error")
-            else: self.fonts = QFontDatabase.applicationFontFamilies(QFontDatabase.addApplicationFont(font))
+            if QFontDatabase.addApplicationFont(font) == -1:
+                print("Error")
+            else:
+                self.fonts = QFontDatabase.applicationFontFamilies(QFontDatabase.addApplicationFont(font))
         self.currentFont = self.fonts[0]
-        self.centralWidget = QWidget()
-        self.mainMenu = QLabel("Main Menu", self)
-        self.addInventory = QPushButton("Add Inventory", self)
-        self.currentInventory = QPushButton("Current Inventory", self)
-        self.soldInventory = QPushButton("Sold Inventory", self)
-        self.incomeView = QPushButton("Income", self)
-        self.buttons = [self.addInventory, self.currentInventory, self.soldInventory, self.incomeView]
-        self.widgets = [self.mainMenu, self.addInventory, self.currentInventory, self.soldInventory, self.incomeView]
-        self.init()
 
-    def init(self):
-        self.centralWidget.setContentsMargins(10, 10, 40, 40)
-        self.setCentralWidget(self.centralWidget)
-        self.mainMenu.setFont(QFont(self.currentFont, 60, QFont.ExtraBold))
-        self.mainMenu.setAlignment(Qt.AlignHCenter)
-        for button in self.buttons:
-            button.setFont(QFont(self.currentFont, self.buttonFontSize, QFont.Bold))
-            button.setStyleSheet("background-color: pink;")
-        self.addInventory.clicked.connect(self.addInventoryClicked)
-        self.currentInventory.clicked.connect(self.currentInventoryClicked)
-        self.soldInventory.clicked.connect(self.soldInventoryClicked)
-        self.incomeView.clicked.connect(self.incomeViewClicked)
-        # Vertical Layout
+        # Create the stack
+        self.stackedWidget = QStackedWidget(self)
+        self.setCentralWidget(self.stackedWidget)
 
-        vbox = QVBoxLayout()
-        for widget in self.widgets:
-            vbox.addWidget(widget)
-        self.centralWidget.setLayout(vbox)
+        # Add all page widgets to the stack
+        self.stackedWidget.addWidget(MainMenu(self.addInventoryCallback)) # index 0
+        self.stackedWidget.addWidget(AddInventory(self.cancelCallback)) # index 1
+        #self.stackedWidget.addWidget(CurrentInventory()) # index 2
+        # self.stackedWidget.addWidget(SoldInventory()) # index 3
+        # self.stackedWidget.addWidget(Income()) # index 4
 
-    def addInventoryClicked(self):
-        print("Clicked Add Inventory")
-        # TODO
-        # Implement transferring from main page to Add Inventory Page
+        # Go to main menu index
+        self.stackedWidget.setCurrentIndex(0)
 
-    def currentInventoryClicked(self):
-        print("Clicked Current Inventory")
-        # TODO
-        # Implement transferring from main page to Current Inventory Page
-    def soldInventoryClicked(self):
-        print("Clicked Sold Inventory")
-        # TODO
-        # Implement transferring from main page to Sold Inventory Page
-    def incomeViewClicked(self):
-        print("Clicked Income")
-        # TODO
-        # Implement transferring from main page to Income Page
+    # Used to cancel current action
+    def cancelCallback(self):
+        self.stackedWidget.setCurrentIndex(0)
+
+    # Used to go to the add inventory page
+    def addInventoryCallback(self):
+        self.stackedWidget.setCurrentIndex(1)
+
+    # Used to go to the current inventory page
+    # def currentInventoryCallback(self):
+    #    self.stackedWidget.setCurrentIndex(2)
+
+    # Used to go to the sold inventory page
+    # def soldInventoryCallback(self):
+    #    self.stackedWidget.setCurrentIndex(3)
+
+    # Used to go to the income page
+    # def Income(self):
+    #    self.stackedWidget.setCurrentIndex(4)
 
 def main():
     app = QApplication(sys.argv)
