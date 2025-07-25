@@ -1,12 +1,10 @@
 import sys
-from email.policy import default
-
 from PyQt5.QtGui import QIcon, QFont, QFontDatabase, QPixmap
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import (QApplication, QWidget, QGridLayout,
                              QPushButton, QLabel, QLineEdit,
                              QComboBox, QFileDialog, QSizePolicy, QPlainTextEdit)
-
+from logs.logger import Logger
 
 class AddInventory(QWidget):
     def __init__(self, cancelCallback):
@@ -16,16 +14,19 @@ class AddInventory(QWidget):
         self.setContentsMargins(40, 10, 40, 10)
         self.buttonFontSize = 25
         self.fixedHeight = 65
-
+        self.logger = Logger(None)
         # Custom Font Setup
-        # self.customFonts = ["../fonts/DancingScript-VariableFont_wght.ttf", ]
-        # for font in self.customFonts:
-        #    if QFontDatabase.addApplicationFont(font) == -1:
-        #        print("Error")
-        #    else:
-        #        self.fonts = QFontDatabase.applicationFontFamilies(QFontDatabase.addApplicationFont(font))[0]
-        # self.currentFont = self.fonts
-        self.currentFont = "Times"
+        try:
+            self.customFonts = ["./fonts/DancingScript-VariableFont_wght.ttf", ]
+            for font in self.customFonts:
+                if QFontDatabase.addApplicationFont(font) == -1:
+                    self.logger.infoLog("Custom font failed to load")
+                else:
+                    self.fonts = QFontDatabase.applicationFontFamilies(QFontDatabase.addApplicationFont(font))
+            self.currentFont = self.fonts[0]
+        except Exception as e:
+            self.logger.debugLog(e)
+            self.currentFont = "Times"
 
         self.grid = QGridLayout()
         self.setLayout(self.grid)

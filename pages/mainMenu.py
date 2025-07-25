@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtGui import QFontDatabase, QFont
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QLabel, QApplication, QPushButton, QWidget, QVBoxLayout)
-
+from logs.logger import Logger
 
 
 class MainMenu(QWidget):
@@ -16,16 +16,19 @@ class MainMenu(QWidget):
         self.setContentsMargins(40, 10, 40, 10)
         self.buttonFontSize = 25
         self.fixedButtonHeight = 65
-
+        self.logger = Logger(None)
         # Custom Font Setup
-        #self.customFonts = ["../fonts/DancingScript-VariableFont_wght.ttf", ]
-        #for font in self.customFonts:
-        #    if QFontDatabase.addApplicationFont(font) == -1:
-        #        print("Error")
-        #    else:
-        #        self.fonts = QFontDatabase.applicationFontFamilies(QFontDatabase.addApplicationFont(font))[0]
-        #self.currentFont = self.fonts
-        self.currentFont = "Times"
+        try:
+            self.customFonts = ["./fonts/DancingScript-VariableFont_wght.ttf", ]
+            for font in self.customFonts:
+                if QFontDatabase.addApplicationFont(font) == -1:
+                    self.logger.infoLog("Custom font failed to load")
+                else:
+                    self.fonts = QFontDatabase.applicationFontFamilies(QFontDatabase.addApplicationFont(font))
+            self.currentFont = self.fonts[0]
+        except Exception as e:
+            self.logger.debugLog(e)
+            self.currentFont = "Times"
 
         # Widget Init
         self.mainMenu = QLabel("Main Menu", self)
@@ -62,22 +65,6 @@ class MainMenu(QWidget):
         for widget in self.widgets:
             vbox.addWidget(widget)
         self.setLayout(vbox)
-
-####################################################################
-    #################################
-    # These will be moved to main.py#
-    #################################
-    def soldInventoryClicked(self):
-        print("Clicked Sold Inventory")
-        # TODO
-        # Implement transferring from main page to Sold Inventory Page
-
-
-    def incomeViewClicked(self):
-        print("Clicked Income")
-        # TODO
-        # Implement transferring from main page to Income Page
-####################################################################
 
 def main():
     app = QApplication(sys.argv)
