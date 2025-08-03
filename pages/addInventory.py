@@ -1,11 +1,13 @@
 import sys
 from PyQt5.QtGui import QIcon, QFont, QFontDatabase, QPixmap
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import Qt, QSize, QByteArray
+from PyQt5.QtSql import QSqlQuery, QSqlDatabase
 from PyQt5.QtWidgets import (QApplication, QWidget, QGridLayout,
                              QPushButton, QLabel, QLineEdit,
                              QComboBox, QFileDialog, QSizePolicy, QPlainTextEdit)
 from logs.logger import Logger
-from logic.databaseLogic import modifyDB, getInfo
+from logic.databaseLogic import modifyDB, getInfo, connectToDB
+
 
 class AddInventory(QWidget):
     def __init__(self, cancelCallback):
@@ -42,6 +44,7 @@ class AddInventory(QWidget):
         self.showItemImage = QLabel(self)
         self.addItem = QPushButton("Add Item", self)
         self.cancel = QPushButton("Cancel", self)
+        self.selectedImagePath = None
         self.buttons = [self.itemImageUpload, self.addItem, self.cancel]
         self.widgets = [self.itemName, self.itemDescription, self.itemType,
                         self.itemAge, self.itemPrice, self.itemImageUpload,
@@ -68,7 +71,7 @@ class AddInventory(QWidget):
 
         # Action taken when each button is pressed
         self.itemImageUpload.clicked.connect(self.itemImageClicked)
-        # self.addItem.clicked.connect(self.addItemClicked)
+        self.addItem.clicked.connect(self.addItemClicked)
         self.cancel.clicked.connect(self.cancelCallback)
 
         # Add all item types to the item types drop down menu
@@ -85,15 +88,35 @@ class AddInventory(QWidget):
         if img:
             pixmap = QPixmap(img).scaled(128,128,Qt.KeepAspectRatio,Qt.SmoothTransformation)
             self.showItemImage.setPixmap(pixmap)
-            #self.showItemImage.setScaledContents(True)
+            self.selectedImagePath = img
         else:
             self.showItemImage.setText("Could not load image.")
+            self.selectedImagePath = None
 
     # Will hold the logic to store any added inventory in the database
     def addItemClicked(self):
-        # TODO
-        # Complete the backend implementation for the Add Item button.
-        pass
+        # Transform objects into text for the database.
+        itemName = self.itemName.text()
+        itemDescription = self.itemDescription.toPlainText()
+        itemType = self.itemType.currentText()
+        itemAge = self.itemAge.text()
+        itemPrice = self.itemPrice.text()
+        # Read image bytes to transform image
+        imageBytes = None
+        if hasattr(self, "selectedImagePath") and self.selectedImagePath:
+            try:
+                with open(self.selectedImagePath, 'rb') as img_file:
+                    imageBytes = img_file.read()
+                    imageBytes = QByteArray(imageBytes)
+            except Exception as e:
+                print("Image read error:", e)
+                imageBytes = None
+        else:
+            print("No selected image.")
+
+        con = connectToDB("postgres")
+        modifyDB(con, itemName, itemDescription, itemType, itemAge, itemPrice, imageBytes)
+        self.cancelCallback()
 
 def main():
     app = QApplication(sys.argv)
