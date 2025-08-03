@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QGridLayout,
                              QPushButton, QLabel, QLineEdit,
                              QComboBox, QFileDialog, QSizePolicy, QPlainTextEdit)
 from logs.logger import Logger
+from logic.databaseLogic import modifyDB, getInfo
 
 class AddInventory(QWidget):
     def __init__(self, cancelCallback):
@@ -36,14 +37,14 @@ class AddInventory(QWidget):
         self.itemDescription = QPlainTextEdit("Please enter the description of the item", self)
         self.itemType = QComboBox(self)
         self.itemAge = QLineEdit("Please enter the age of the item", self)
-        self.itemPurchasePrice = QLineEdit("Please enter the purchase price of the item", self)
+        self.itemPrice = QLineEdit("Please enter the price of the item", self)
         self.itemImageUpload = QPushButton("Upload Image(s)", self)
         self.showItemImage = QLabel(self)
         self.addItem = QPushButton("Add Item", self)
         self.cancel = QPushButton("Cancel", self)
         self.buttons = [self.itemImageUpload, self.addItem, self.cancel]
         self.widgets = [self.itemName, self.itemDescription, self.itemType,
-                        self.itemAge, self.itemPurchasePrice, self.itemImageUpload,
+                        self.itemAge, self.itemPrice, self.itemImageUpload,
                         self.showItemImage, self.addItem, self.cancel]
         self.itemTypes = ["Please select an item type",
                           "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
@@ -93,7 +94,6 @@ class AddInventory(QWidget):
         # TODO
         # Complete the backend implementation for the Add Item button.
         pass
-
 
 def main():
     app = QApplication(sys.argv)
