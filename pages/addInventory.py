@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QGridLayout,
                              QPushButton, QLabel, QLineEdit,
                              QComboBox, QFileDialog, QSizePolicy, QPlainTextEdit)
 from logs.logger import Logger
-from logic.databaseLogic import modifyDB, getInfo, connectToDB
+from logic.databaseLogic import modifyDB, connectToDB # getInfo
 
 
 class AddInventory(QWidget):
