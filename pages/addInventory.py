@@ -1,7 +1,6 @@
 import sys
-from PyQt5.QtGui import QIcon, QFont, QFontDatabase, QPixmap
-from PyQt5.QtCore import Qt, QSize, QByteArray
-from PyQt5.QtSql import QSqlQuery, QSqlDatabase
+from PyQt5.QtGui import QFont, QFontDatabase, QPixmap
+from PyQt5.QtCore import Qt, QByteArray
 from PyQt5.QtWidgets import (QApplication, QWidget, QGridLayout,
                              QPushButton, QLabel, QLineEdit,
                              QComboBox, QFileDialog, QSizePolicy, QPlainTextEdit)
