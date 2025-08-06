@@ -1,18 +1,19 @@
 import sys
 from PyQt5.QtGui import QFont, QFontDatabase, QPixmap
-from PyQt5.QtCore import Qt, QByteArray
+from PyQt5.QtCore import Qt, QByteArray, pyqtSignal
 from PyQt5.QtWidgets import (QApplication, QWidget, QGridLayout,
                              QPushButton, QLabel, QLineEdit,
                              QComboBox, QFileDialog, QSizePolicy, QPlainTextEdit)
+
+from configs.databaseInfo import databaseName
 from logs.logger import Logger
 from logic.databaseLogic import modifyDB, connectToDB # getInfo
 
 
 class AddInventory(QWidget):
-    def __init__(self, cancelCallback):
+    pageChangeRequest = pyqtSignal(str)
+    def __init__(self):
         super().__init__()
-        self.cancelCallback = cancelCallback
-
         self.setContentsMargins(40, 10, 40, 10)
         self.buttonFontSize = 25
         self.fixedHeight = 65
@@ -71,7 +72,7 @@ class AddInventory(QWidget):
         # Action taken when each button is pressed
         self.itemImageUpload.clicked.connect(self.itemImageClicked)
         self.addItem.clicked.connect(self.addItemClicked)
-        self.cancel.clicked.connect(self.cancelCallback)
+        self.cancel.clicked.connect(self.emitMainMenuRequest)
 
         # Add all item types to the item types drop down menu
         for i in self.itemTypes:
@@ -113,9 +114,15 @@ class AddInventory(QWidget):
         else:
             print("No selected image.")
 
-        con = connectToDB("postgres")
-        modifyDB(con, itemName, itemDescription, itemType, itemAge, itemPrice, imageBytes)
-        self.cancelCallback()
+        try:
+            con = connectToDB("postgres")
+            modifyDB(con, itemName, itemDescription, itemType, itemAge, itemPrice, imageBytes)
+            self.emitMainMenuRequest()
+        except Exception as e:
+            Logger.debugLog(self, e)
+
+    def emitMainMenuRequest(self):
+        self.pageChangeRequest.emit("mainMenu")
 
 def main():
     app = QApplication(sys.argv)

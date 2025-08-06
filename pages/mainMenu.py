@@ -1,17 +1,15 @@
 import sys
 from PyQt5.QtGui import QFontDatabase, QFont
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import (QLabel, QApplication, QPushButton, QWidget, QVBoxLayout)
 from logs.logger import Logger
 
 
 class MainMenu(QWidget):
-    def __init__(self, addInventoryCallback):
-        super().__init__()
-        # Callbacks to go to all the pages via buttons
-        self.addInventoryCallback = addInventoryCallback
-        #self.currentInventoryCallback = currentInventoryCallback
+    pageChangeRequest = pyqtSignal(str)
 
+    def __init__(self):
+        super().__init__()
         # Page setup
         self.setContentsMargins(40, 10, 40, 10)
         self.buttonFontSize = 25
@@ -55,8 +53,8 @@ class MainMenu(QWidget):
             button.setStyleSheet("background-color: pink;")
 
         # Actions taken when each button is clicked (Callbacks)
-        self.addInventory.clicked.connect(self.addInventoryCallback)
-        #self.currentInventory.clicked.connect(self.currentInventoryCallback)
+        self.addInventory.clicked.connect(self.emitAddInventoryRequest)
+        self.currentInventory.clicked.connect(self.emitCurrentInventoryRequest)
         #self.soldInventory.clicked.connect(self.soldInventoryCallback)
         #self.income.clicked.connect(self.incomeCallback)
 
@@ -65,6 +63,12 @@ class MainMenu(QWidget):
         for widget in self.widgets:
             vbox.addWidget(widget)
         self.setLayout(vbox)
+
+    def emitAddInventoryRequest(self):
+        self.pageChangeRequest.emit("addInventory")
+
+    def emitCurrentInventoryRequest(self):
+        self.pageChangeRequest.emit("currentInventory")
 
 def main():
     app = QApplication(sys.argv)

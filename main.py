@@ -3,10 +3,11 @@ import sys
 from PyQt5.QtGui import QIcon, QFontDatabase
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QLabel,
-                             QPushButton, QWidget, QVBoxLayout, QStackedWidget)
+                             QPushButton, QWidget, QVBoxLayout, QStackedWidget, QMessageBox)
+from pages.currentInventory import CurrentInventory
 from pages.mainMenu import MainMenu
 from pages.addInventory import AddInventory
-#from pages.currentInventory import CurrentInventory
+# from pages.currentInventory import CurrentInventory
 #from pages.soldInventory import SoldInventory
 #from pages.income import Income
 
@@ -33,39 +34,40 @@ class MainWindow(QMainWindow):
             self.currentFont = "Times"
             self.logger.debugLog(e)
 
+        # Setup pagination
+        self.mainMenu = MainMenu()
+        self.addInventory = AddInventory()
+        self.currentInventory = CurrentInventory()
+
+        self.pages = {
+            "mainMenu": self.mainMenu,
+            "addInventory": self.addInventory,
+            "currentInventory": self.currentInventory,
+        }
+
         # Create the stack
         self.stackedWidget = QStackedWidget(self)
         self.setCentralWidget(self.stackedWidget)
 
         # Add all page widgets to the stack
-        self.stackedWidget.addWidget(MainMenu(self.addInventoryCallback)) # index 0
-        self.stackedWidget.addWidget(AddInventory(self.cancelCallback)) # index 1
-        # self.stackedWidget.addWidget(CurrentInventory()) # index 2
+        self.stackedWidget.addWidget(self.mainMenu) # index 0
+        self.stackedWidget.addWidget(self.addInventory) # index 1
+        self.stackedWidget.addWidget(self.currentInventory) # index 2
         # self.stackedWidget.addWidget(SoldInventory()) # index 3
         # self.stackedWidget.addWidget(Income()) # index 4
+        self.mainMenu.pageChangeRequest.connect(self.changePage)
+        self.addInventory.pageChangeRequest.connect(self.changePage)
+        self.currentInventory.pageChangeRequest.connect(self.changePage)
 
         # Go to main menu index
         self.stackedWidget.setCurrentIndex(0)
 
-    # Used to cancel current action
-    def cancelCallback(self):
-        self.stackedWidget.setCurrentIndex(0)
 
-    # Used to go to the add inventory page
-    def addInventoryCallback(self):
-        self.stackedWidget.setCurrentIndex(1)
+    def changePage(self, pageName):
+        if pageName in self.pages:
+            self.stackedWidget.setCurrentWidget(self.pages[pageName])
+        else: self.stackedWidget.setCurrentWidget(self.pages['mainMenu'])
 
-    # Used to go to the current inventory page
-    # def currentInventoryCallback(self):
-    #    self.stackedWidget.setCurrentIndex(2)
-
-    # Used to go to the sold inventory page
-    # def soldInventoryCallback(self):
-    #    self.stackedWidget.setCurrentIndex(3)
-
-    # Used to go to the income page
-    # def Income(self):
-    #    self.stackedWidget.setCurrentIndex(4)
 
 def main():
     app = QApplication(sys.argv)
