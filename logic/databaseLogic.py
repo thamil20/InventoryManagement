@@ -64,5 +64,21 @@ def modifyDB(connection, itemName, itemDescription, itemType, itemAge, itemPrice
         return None
 
 # TODO
-# def getInfo(query):
-#     pass
+def getInfo(connection):
+    results = []
+    query = QSqlQuery(connection)
+    query.prepare("""SELECT * FROM currentInventory""")
+    if query.exec():
+        while query.next():
+            # Get values by index (0-based)
+            identifier = query.value(0)  # First column
+            itemName = query.value(1)  # Second column
+            itemDescription = query.value(2)
+            itemType = query.value(3)
+            itemAge = query.value(4)
+            itemPrice = query.value(5)
+            imageBytes = query.value(6)
+            # COME BACK AND ADD IMAGEBYTES EXPORT SUPPORT
+            results.append((identifier, itemName, itemDescription, itemType, itemAge, itemPrice))
+
+    return results
